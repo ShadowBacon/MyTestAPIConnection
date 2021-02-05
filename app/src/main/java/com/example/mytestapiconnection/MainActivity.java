@@ -15,40 +15,49 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import com.example.mytestapiconnection.warte;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
     String weather;
     String movie;
     String genre;
+    RequestQueue queue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ConstraintLayout background = findViewById(R.id.background);
+        background.setBackgroundResource(R.drawable.background);
+
     }
 
-    public void clickStart(View view) {
+    public void clickStart(View view) throws InterruptedException {
 
-        WeatherAPIRequest();
-        TheMovieDBRequest();
+        EditText plz = findViewById(R.id.editTextTextPersonName);
+        String test = plz.getText().toString();
+        TextView err = findViewById(R.id.textView4);
 
-        TextView Weather = findViewById(R.id.tVWeather);
-        TextView Movie = findViewById(R.id.tVMovie);
+            err.setText("");
+            WeatherAPIRequest();
+            Thread.sleep(1000);
+            //TheMovieDBRequest();
 
-        //ConstraintLayout background = findViewById(R.id.background);
-        //background.setBackground();
+            TextView Weather = findViewById(R.id.tVWeather);
+            TextView Movie = findViewById(R.id.tVMovie);
 
-        Weather.setText(weather);
-        Movie.setText(movie);
+            ConstraintLayout background = findViewById(R.id.background);
+            //background.setBackgroundResource(R.drawable.background);
+            background.setBackgroundResource(R.drawable.unbenannt);
+
+            Weather.setText(weather);
+            Movie.setText(movie);
 
     }
 
@@ -65,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET,Url,null, new Response.Listener<JSONObject>() {
 
-            public void onResponse(JSONObject response) {
+            public synchronized void onResponse(JSONObject response) {
                 try {
                     //JSONObject main_object = response.getJSONObject("main");
                     JSONArray array = response.getJSONArray("weather");
@@ -76,10 +85,91 @@ public class MainActivity extends AppCompatActivity {
 
                     System.out.println(main);
                     weather = main;
+
                     TextView Weather = findViewById(R.id.tVWeather);
                     Weather.setText(main);
 
-                    String wetter = main;
+                    TextView tVWetter = findViewById(R.id.tVWeather);
+                    CharSequence charwetter;
+                    String wetter;
+
+                    charwetter = tVWetter.getText();
+                    wetter = charwetter.toString();
+
+                    System.out.println(weather);
+
+                    switch(wetter){
+                        case("light snow"):
+                            genre = "35";
+                            break;
+                        case("few clouds"):
+                            genre = "12";
+                            break;
+                        case("scattered clouds"):
+                            genre = "99";
+                            break;
+                        case("broken clouds"):
+                            genre = "10751";
+                            break;
+                        case("shower rain"):
+                            genre = "18";
+                            break;
+                        case("rain"):
+                            genre = "10";
+                            break;
+                        case("thunderstorm"):
+                            genre = "80";
+                            break;
+                        case("snow"):
+                            genre = "16";
+                            break;
+                        case("mist"):
+                            genre = "27";
+                            break;
+                        default:
+                            genre = "9648";
+                            break;
+                    }
+
+                    String Url =  "https://api.themoviedb.org/3/discover/movie?api_key=ac7c6e47f9f97ddc2fe955d0904a36a4&with_genres=" + genre + "&sort_by=vote_average.desc&vote_count.gte=10&include_adult=true";
+
+                    JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET,Url,null, new Response.Listener<JSONObject>() {
+
+                        public synchronized void onResponse(JSONObject response) {
+                            try {
+
+                                Random r = new Random();
+                                int low = 0; int high = 19;
+                                int result = r.nextInt(high-low) + low;
+
+                                //JSONObject main_object = response.getJSONObject("");
+                                JSONArray array = response.getJSONArray("results");
+                                JSONObject object = array.getJSONObject(result);
+
+                                String main = object.getString("title");
+                                //System.out.println(object);
+
+                                System.out.println(main);
+
+                                movie = main;
+                                TextView Movie = findViewById(R.id.tVMovie);
+                                Movie.setText(movie);
+
+
+                            }catch(JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }, new Response.ErrorListener() {
+                        public void onErrorResponse(VolleyError error){
+
+                        }
+                    }
+                    );
+
+                    queue.add(jor);
 
                 }catch(JSONException e)
                 {
@@ -93,22 +183,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         );
-        RequestQueue queue = Volley.newRequestQueue(this);
+        queue = Volley.newRequestQueue(this);
         queue.add(jor);
 
 
 
     }
 
-
+/*
     public void TheMovieDBRequest() {
 
-        String wetter = "scattered clouds";
+        TextView tVWetter = findViewById(R.id.tVWeather);
+        CharSequence charwetter;
+        String wetter;
 
-        System.out.println(wetter);
+        charwetter = tVWetter.getText();
+        wetter = charwetter.toString();
+
+        System.out.println(weather);
 
         switch(wetter){
-            case("clear sky"):
+            case("overcast clouds"):
                 genre = "35";
                 break;
             case("few clouds"):
@@ -139,19 +234,17 @@ public class MainActivity extends AppCompatActivity {
                     break;
         }
 
-
-
-
-        Random r = new Random();
-        int low = 0; int high = 19;
-        int result = r.nextInt(high-low) + low;
-
         String Url =  "https://api.themoviedb.org/3/discover/movie?api_key=ac7c6e47f9f97ddc2fe955d0904a36a4&with_genres=" + genre + "&sort_by=vote_average.desc&vote_count.gte=10&include_adult=true";
 
         JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET,Url,null, new Response.Listener<JSONObject>() {
 
-            public void onResponse(JSONObject response) {
+            public synchronized void onResponse(JSONObject response) {
                 try {
+
+                    Random r = new Random();
+                    int low = 0; int high = 19;
+                    int result = r.nextInt(high-low) + low;
+
                     //JSONObject main_object = response.getJSONObject("");
                     JSONArray array = response.getJSONArray("results");
                     JSONObject object = array.getJSONObject(result);
@@ -183,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jor);
 
     }
-
+*/
     public void clickClear(View view){
     TextView wetter = findViewById(R.id.tVWeather);
     TextView film = findViewById(R.id.tVMovie);
@@ -191,6 +284,10 @@ public class MainActivity extends AppCompatActivity {
     wetter.setText("");
     film.setText("");
     plz.setText("");
+
+        ConstraintLayout background = findViewById(R.id.background);
+        background.setBackgroundResource(R.drawable.background);
+        //background.setBackgroundResource(R.drawable.unbenannt);
     }
 
 
