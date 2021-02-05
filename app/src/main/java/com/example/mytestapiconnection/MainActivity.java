@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void clickStart(View view) {
 
+        WeatherAPIRequest();
+        TheMovieDBRequest();
+
         TextView Weather = findViewById(R.id.tVWeather);
         TextView Movie = findViewById(R.id.tVMovie);
 
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void WeatherAPIRequest( String stadt){
+    public void WeatherAPIRequest(){
 
         EditText plz = findViewById(R.id.editTextTextPersonName);
 
@@ -98,7 +101,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void TheMovieDBRequest(String wetter) {
+    public void TheMovieDBRequest() {
+
+        String wetter = "scattered clouds";
 
         System.out.println(wetter);
 
