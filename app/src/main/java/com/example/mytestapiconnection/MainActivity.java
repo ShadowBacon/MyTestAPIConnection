@@ -23,9 +23,6 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    String weather;
-    String movie;
-    String genre;
     RequestQueue queue;
 
     @Override
@@ -34,31 +31,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ConstraintLayout background = findViewById(R.id.background);
-        background.setBackgroundResource(R.drawable.background);
+        background.setBackgroundResource(R.drawable.bg_bluesky);
 
     }
 
     public void clickStart(View view) throws InterruptedException {
 
-        EditText plz = findViewById(R.id.editTextTextPersonName);
-        String test = plz.getText().toString();
-        TextView err = findViewById(R.id.textView4);
-
-            err.setText("");
             WeatherAPIRequest();
             Thread.sleep(1000);
-            //TheMovieDBRequest();
-
-            TextView Weather = findViewById(R.id.tVWeather);
-            TextView Movie = findViewById(R.id.tVMovie);
 
             ConstraintLayout background = findViewById(R.id.background);
-            //background.setBackgroundResource(R.drawable.background);
-            background.setBackgroundResource(R.drawable.unbenannt);
+            background.setBackgroundResource(R.drawable.bg_popcorn);
 
-            Weather.setText(weather);
-            Movie.setText(movie);
+    }
 
+    public void clickClear(View view){
+        TextView wetter = findViewById(R.id.tVWeather);
+        TextView film = findViewById(R.id.tVMovie);
+        EditText plz = findViewById(R.id.editTextTextPersonName);
+
+        wetter.setText("");
+        film.setText("");
+        plz.setText("");
+
+        ConstraintLayout background = findViewById(R.id.background);
+        background.setBackgroundResource(R.drawable.bg_bluesky);
     }
 
     public void WeatherAPIRequest(){
@@ -68,37 +65,24 @@ public class MainActivity extends AppCompatActivity {
         String zip = plz.getText().toString();
 
         String Url =  "https://api.openweathermap.org/data/2.5/weather?zip="+ zip + ",de&appid=a1bf60f16e9591de80543884372c8cd8";
-                //"https://api.openweathermap.org/data/2.5/weather?id=" + stadt + "&appid=a1bf60f16e9591de80543884372c8cd8";
-        String wetter;
-        //System.out.println(Url);
 
         JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET,Url,null, new Response.Listener<JSONObject>() {
 
             public synchronized void onResponse(JSONObject response) {
                 try {
-                    //JSONObject main_object = response.getJSONObject("main");
                     JSONArray array = response.getJSONArray("weather");
                     JSONObject object = array.getJSONObject(0);
 
                     String main = object.getString("description");
-                    //System.out.println(object);
-
-                    System.out.println(main);
-                    weather = main;
 
                     TextView Weather = findViewById(R.id.tVWeather);
                     Weather.setText(main);
 
-                    TextView tVWetter = findViewById(R.id.tVWeather);
-                    CharSequence charwetter;
-                    String wetter;
+                    System.out.println(main);
 
-                    charwetter = tVWetter.getText();
-                    wetter = charwetter.toString();
+                    String genre;
 
-                    System.out.println(weather);
-
-                    switch(wetter){
+                    switch(main){
                         case("light snow"):
                             genre = "35";
                             break;
@@ -142,55 +126,45 @@ public class MainActivity extends AppCompatActivity {
                                 int low = 0; int high = 19;
                                 int result = r.nextInt(high-low) + low;
 
-                                //JSONObject main_object = response.getJSONObject("");
                                 JSONArray array = response.getJSONArray("results");
                                 JSONObject object = array.getJSONObject(result);
 
                                 String main = object.getString("title");
-                                //System.out.println(object);
 
-                                System.out.println(main);
-
-                                movie = main;
                                 TextView Movie = findViewById(R.id.tVMovie);
-                                Movie.setText(movie);
-
+                                Movie.setText(main);
 
                             }catch(JSONException e)
                             {
                                 e.printStackTrace();
                             }
                         }
-
                     }, new Response.ErrorListener() {
                         public void onErrorResponse(VolleyError error){
-
                         }
                     }
                     );
-
                     queue.add(jor);
-
                 }catch(JSONException e)
                 {
                     e.printStackTrace();
                 }
             }
-
         }, new Response.ErrorListener() {
             public void onErrorResponse(VolleyError error){
-
             }
         }
         );
+
         queue = Volley.newRequestQueue(this);
         queue.add(jor);
-
-
 
     }
 
 /*
+
+    Eigentliche 2.Methode die bereits in die Erste Methode übernommen wurde.
+
     public void TheMovieDBRequest() {
 
         TextView tVWetter = findViewById(R.id.tVWeather);
@@ -277,19 +251,5 @@ public class MainActivity extends AppCompatActivity {
 
     }
 */
-    public void clickClear(View view){
-    TextView wetter = findViewById(R.id.tVWeather);
-    TextView film = findViewById(R.id.tVMovie);
-    EditText plz = findViewById(R.id.editTextTextPersonName);
-    wetter.setText("");
-    film.setText("");
-    plz.setText("");
-
-        ConstraintLayout background = findViewById(R.id.background);
-        background.setBackgroundResource(R.drawable.background);
-        //background.setBackgroundResource(R.drawable.unbenannt);
-    }
-
-
 
 }
