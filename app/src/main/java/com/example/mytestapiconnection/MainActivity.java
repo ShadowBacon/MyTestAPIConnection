@@ -27,25 +27,29 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Initialisierung des Layouts(activity_main)
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ConstraintLayout background = findViewById(R.id.background);
         background.setBackgroundResource(R.drawable.bg_bluesky);
-
     }
 
+    //ausführung der Methode per Knopfdruck
     public void clickStart(View view) throws InterruptedException {
 
             WeatherAPIRequest();
             Thread.sleep(1000);
 
+            //deklarieren der einzellnen TextLabels im Layout
             ConstraintLayout background = findViewById(R.id.background);
+            //anpassen des Backgrounds auf die neue Bild Datei
             background.setBackgroundResource(R.drawable.bg_popcorn);
-
     }
 
+    //ausführung der Methode per Knopfdruck
     public void clickClear(View view){
+        //deklarieren der einzellnen TextLabels im Layout
         TextView wetter = findViewById(R.id.tVWeather);
         TextView film = findViewById(R.id.tVMovie);
         EditText plz = findViewById(R.id.editTextTextPersonName);
@@ -59,29 +63,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void WeatherAPIRequest(){
-
+        //auslesen der Postleitzahl aus Layout
         EditText plz = findViewById(R.id.editTextTextPersonName);
 
         String zip = plz.getText().toString();
-
+        //erstellen des Strings für den Abruf
         String Url =  "https://api.openweathermap.org/data/2.5/weather?zip="+ zip + ",de&appid=a1bf60f16e9591de80543884372c8cd8";
 
+        //erstellen der Request
         JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET,Url,null, new Response.Listener<JSONObject>() {
 
             public synchronized void onResponse(JSONObject response) {
                 try {
+                    //auslesen JSON Datei in Array laden
                     JSONArray array = response.getJSONArray("weather");
                     JSONObject object = array.getJSONObject(0);
 
+                    //auslesen des vermerkten Strings ander stelle description
                     String main = object.getString("description");
 
                     TextView Weather = findViewById(R.id.tVWeather);
                     Weather.setText(main);
 
-                    System.out.println(main);
-
                     String genre;
-
+                    //umwandeln des Wetters in die passenden Daten für ein Request nach Genre
                     switch(main){
                         case("light snow"):
                             genre = "35";
@@ -136,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }catch(JSONException e)
                             {
+                                //error handling
                                 e.printStackTrace();
                             }
                         }
@@ -155,8 +161,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         );
-
+        //belegen der g-var mit der passenden queue
         queue = Volley.newRequestQueue(this);
+        //start der abfrage für wetter und filme
         queue.add(jor);
 
     }
