@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
 /*
 
     Eigentliche 2.Methode die bereits in die Erste Methode übernommen wurde.
+    Musste aber ins try and catch übernommen werden wegen der Asynchronen APIs.
 
     public void TheMovieDBRequest() {
 
