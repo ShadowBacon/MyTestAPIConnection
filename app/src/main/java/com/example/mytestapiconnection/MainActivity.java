@@ -30,21 +30,26 @@ public class MainActivity extends AppCompatActivity {
         //Initialisierung des Layouts(activity_main)
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        ConstraintLayout background = findViewById(R.id.background);
-        background.setBackgroundResource(R.drawable.bg_bluesky);
     }
 
     //ausführung der Methode per Knopfdruck
-    public void clickStart(View view) throws InterruptedException {
+    public void clickStart(View view) {
+
+        EditText test = findViewById(R.id.editTextTextPersonName);
+        CharSequence err = test.getText();
+
+        if(err.length() > 4){
 
             WeatherAPIRequest();
-            Thread.sleep(1000);
 
             //deklarieren der einzellnen TextLabels im Layout
             ConstraintLayout background = findViewById(R.id.background);
             //anpassen des Backgrounds auf die neue Bild Datei
             background.setBackgroundResource(R.drawable.bg_popcorn);
+        } else {
+            TextView errLayout = findViewById(R.id.textView4);
+            errLayout.setText("! Fehler zu wenig Zeichen !");
+        }
     }
 
     //ausführung der Methode per Knopfdruck
@@ -53,10 +58,12 @@ public class MainActivity extends AppCompatActivity {
         TextView wetter = findViewById(R.id.tVWeather);
         TextView film = findViewById(R.id.tVMovie);
         EditText plz = findViewById(R.id.editTextTextPersonName);
+        TextView errLayout = findViewById(R.id.textView4);
 
         wetter.setText("");
         film.setText("");
         plz.setText("");
+        errLayout.setText("");
 
         ConstraintLayout background = findViewById(R.id.background);
         background.setBackgroundResource(R.drawable.bg_bluesky);
@@ -79,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray array = response.getJSONArray("weather");
                     JSONObject object = array.getJSONObject(0);
 
-                    //auslesen des vermerkten Strings ander stelle description
+                    //auslesen des vermerkten Strings an der stelle description
                     String main = object.getString("description");
 
                     TextView Weather = findViewById(R.id.tVWeather);
